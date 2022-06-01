@@ -12,15 +12,15 @@ from player import Player
 
 pygame.init()
 
-print("hello world")
+print("fuck you boiiiiiiiiiiiiiiii");
 
 WIDTH = 1280
 HEIGHT = 720
 SPEED = 20
 FPS = 120
 
-player_width = 50;
-player_height = 50;
+player_width = 50
+player_height = 50
 
 pygame.display.set_caption("SHITTY GAME")
 daScreen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -46,6 +46,7 @@ running = True
 
 
 fire = False
+canShoot = True
 
 daFont = pygame.font.SysFont(None, 100)
 
@@ -63,8 +64,20 @@ def addEnemy():
     print("adding random enemy")
     enemy = Enemy()
     enemy.daType = daType
-    enemy.x = WIDTH
-    enemy.y = random.randint(0, HEIGHT)
+
+    if (enemy.daSpawn == "right"):
+        enemy.x = WIDTH
+        enemy.y = random.randint(0, HEIGHT)
+    elif (enemy.daSpawn == "left"):
+        enemy.x = -enemy.daImage.get_width()
+        enemy.y = random.randint(0, HEIGHT)
+    elif (enemy.daSpawn == "up"):
+        enemy.y = -enemy.daImage.get_height()
+        enemy.x = random.randint(0, WIDTH)
+    elif (enemy.daSpawn == "down"):
+        enemy.y = HEIGHT
+        enemy.x = random.randint(0, WIDTH)
+
     
     if (enemy.daType == "colossal"):
         enemy.daImage = pygame.transform.scale(enemy.daImage, (80,80))
@@ -72,8 +85,9 @@ def addEnemy():
         enemy.daImage = pygame.transform.scale(enemy.daImage, (30,30))
     else:        
         enemy.daImage = pygame.transform.scale(enemy.daImage, (50,50))
-    
-    print(enemy.x, enemy.y)
+
+    print(enemy.x, enemy.y)    
+    print(enemy.daSpawn);    
     enemys.append(enemy)
 
 def addingBullet():
@@ -88,6 +102,16 @@ startTick = pygame.time.get_ticks()
 seconds = 0
 
 clock = pygame.time.Clock()
+
+def shittyTimer(seconds, doCode):
+    curSeconds = 0
+    startTick = pygame.time.get_ticks()
+    while curSeconds < seconds:
+        curSeconds += (pygame.time.get_ticks() - startTick)/1000
+    else:
+        doCode()
+
+    
 
 
 while running:
@@ -104,8 +128,9 @@ while running:
         
         if (event.type == pygame.KEYDOWN):
 
-            if (event.key == pygame.K_SPACE):
+            if (event.key == pygame.K_SPACE and canShoot):
                 addingBullet()
+
 
             if (event.key == pygame.K_LEFT):
                 left = True
@@ -139,6 +164,8 @@ while running:
         startTick = pygame.time.get_ticks()
         addEnemy()
 
+    #shittyTimer(10 ,addEnemy)
+
 
 
     if (right or left or down or up):
@@ -160,16 +187,28 @@ while running:
 
     if (len(enemys) > 0):
         for enemy in enemys:
-            if (enemy.daType == "colossal"):
-                enemy.x -= 10 * elapsed
-            elif (enemy.daType == "minimoys"):
-                enemy.x -= 25 * elapsed
-            else:                
-                enemy.x -= 15 * elapsed
+            enemySPEED = 0
             
+            if (enemy.daType == "colossal"):
+                enemySPEED = 10 * elapsed
+            elif (enemy.daType == "minimoys"):
+                enemySPEED = 25 * elapsed
+            else:                
+                enemySPEED = 15 * elapsed
+            
+            if (enemy.daSpawn == "right"):
+                enemy.x -= enemySPEED
+            elif (enemy.daSpawn == "left"):
+                enemy.x += enemySPEED
+            elif (enemy.daSpawn == "down"):
+                enemy.y -= enemySPEED
+            elif(enemy.daSpawn == "up"):
+                enemy.y += enemySPEED
+
             daScreen.blit(enemy.daImage, (enemy.x, enemy.y))
             
-            if (enemy.x < -200):
+            # wtf is that
+            if (enemy.x < -200 and enemy.daSpawn == "right" or enemy.x > WIDTH and enemy.daSpawn == "left" or enemy.y > HEIGHT and enemy.daSpawn == "up" or enemy.y < -200 and enemy.daSpawn == "down"):
                 enemys.remove(enemy)
 
 

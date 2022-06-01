@@ -9,3 +9,5 @@ class Enemy(pygame.sprite.Sprite):
         self.y = self.rect.y
         self.daType = ""
         self.health = 1
+        self.spawn = ['left', 'right', 'down', 'up']
+        self.daSpawn = self.spawn[random.randint(0,3)]
